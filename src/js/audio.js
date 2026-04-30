@@ -1,24 +1,17 @@
 let ctxAudio;
 let fonteRuidoFogo;
 let ganhoFogo;
-let bufferIgnicao = null;
+
+const audioIgnicao = new Audio('assets/sounds/salamisound-4119921-matchstick-burn-without.mp3');
+audioIgnicao.preload = 'auto';
 
 function iniciarAudio() {
   if (!ctxAudio) {
     ctxAudio = new (window.AudioContext || window.webkitAudioContext)();
-    carregarSomIgnicao();
   }
   if (ctxAudio.state === 'suspended') {
     ctxAudio.resume();
   }
-}
-
-function carregarSomIgnicao() {
-  fetch('assets/sounds/salamisound-4119921-matchstick-burn-without.mp3')
-    .then(r => r.arrayBuffer())
-    .then(dados => ctxAudio.decodeAudioData(dados))
-    .then(buffer => { bufferIgnicao = buffer; })
-    .catch(() => {});
 }
 
 function tocarSomRiscado(intensidade) {
@@ -56,25 +49,12 @@ function tocarSomIgnicao() {
   iniciarAudio();
   if (!ctxAudio) return;
 
-  // Toca o MP3 real de ignição se já carregado
-  if (bufferIgnicao) {
-    const fonte  = ctxAudio.createBufferSource();
-    fonte.buffer = bufferIgnicao;
+  // Toca o MP3 real de ignição
+  audioIgnicao.currentTime = 0;
+  audioIgnicao.volume      = 0.9;
+  audioIgnicao.play().catch(() => {});
 
-    const ganho = ctxAudio.createGain();
-    ganho.gain.setValueAtTime(0.9, ctxAudio.currentTime);
-
-    fonte.connect(ganho);
-    ganho.connect(ctxAudio.destination);
-    fonte.start();
-
-    // Armazena como fonte do fogo para poder parar depois
-    fonteRuidoFogo = fonte;
-    ganhoFogo      = ganho;
-    return;
-  }
-
-  // Fallback procedural caso o arquivo ainda não tenha carregado
+  // Som procedural de chama contínua (fallback / camada de fundo)
   const oscilador = ctxAudio.createOscillator();
   oscilador.type = 'sine';
   oscilador.frequency.setValueAtTime(150, ctxAudio.currentTime);
@@ -145,6 +125,9 @@ function tocarSomSilvo() {
 }
 
 function pararSomFogo() {
+  audioIgnicao.pause();
+  audioIgnicao.currentTime = 0;
+
   if (fonteRuidoFogo && ganhoFogo) {
     ganhoFogo.gain.linearRampToValueAtTime(0, ctxAudio.currentTime + 0.3);
     setTimeout(() => {
