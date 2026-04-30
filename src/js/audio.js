@@ -1,14 +1,24 @@
 let ctxAudio;
 let fonteRuidoFogo;
 let ganhoFogo;
+let bufferIgnicao = null;
 
 function iniciarAudio() {
   if (!ctxAudio) {
     ctxAudio = new (window.AudioContext || window.webkitAudioContext)();
+    carregarSomIgnicao();
   }
   if (ctxAudio.state === 'suspended') {
     ctxAudio.resume();
   }
+}
+
+function carregarSomIgnicao() {
+  fetch('assets/sounds/salamisound-4119921-matchstick-burn-without.mp3')
+    .then(r => r.arrayBuffer())
+    .then(dados => ctxAudio.decodeAudioData(dados))
+    .then(buffer => { bufferIgnicao = buffer; })
+    .catch(() => {});
 }
 
 function tocarSomRiscado(intensidade) {
@@ -46,6 +56,25 @@ function tocarSomIgnicao() {
   iniciarAudio();
   if (!ctxAudio) return;
 
+  // Toca o MP3 real de ignição se já carregado
+  if (bufferIgnicao) {
+    const fonte  = ctxAudio.createBufferSource();
+    fonte.buffer = bufferIgnicao;
+
+    const ganho = ctxAudio.createGain();
+    ganho.gain.setValueAtTime(0.9, ctxAudio.currentTime);
+
+    fonte.connect(ganho);
+    ganho.connect(ctxAudio.destination);
+    fonte.start();
+
+    // Armazena como fonte do fogo para poder parar depois
+    fonteRuidoFogo = fonte;
+    ganhoFogo      = ganho;
+    return;
+  }
+
+  // Fallback procedural caso o arquivo ainda não tenha carregado
   const oscilador = ctxAudio.createOscillator();
   oscilador.type = 'sine';
   oscilador.frequency.setValueAtTime(150, ctxAudio.currentTime);
@@ -120,7 +149,7 @@ function pararSomFogo() {
     ganhoFogo.gain.linearRampToValueAtTime(0, ctxAudio.currentTime + 0.3);
     setTimeout(() => {
       if (fonteRuidoFogo) {
-        fonteRuidoFogo.stop();
+        try { fonteRuidoFogo.stop(); } catch (_) {}
         fonteRuidoFogo = null;
       }
     }, 300);
