@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fósforo</title>
+  <link rel="stylesheet" href="src/css/style.css" />
+</head>
+<body>
+  <p id="instruction">Arraste rápido para riscar</p>
+  <div id="barra-calor"><div id="progresso-calor"></div></div>
+
+  <div id="caixa-fosforos">
+    <div class="fosforo-mini ativo"><div class="mini-cabeca"></div><div class="mini-palito"></div></div>
+    <div class="fosforo-mini"><div class="mini-cabeca"></div><div class="mini-palito"></div></div>
+    <div class="fosforo-mini"><div class="mini-cabeca"></div><div class="mini-palito"></div></div>
+    <div class="fosforo-mini"><div class="mini-cabeca"></div><div class="mini-palito"></div></div>
+    <div class="fosforo-mini"><div class="mini-cabeca"></div><div class="mini-palito"></div></div>
+  </div>
+
+  <div id="contador-riscadas"></div>
+  <p id="sem-fosforos">Sem fósforos</p>
+
+  <div class="scene">
+    <div class="match" id="match">
+      <div id="smoke-container">
+        <div class="smoke smoke-1"></div>
+        <div class="smoke smoke-2"></div>
+        <div class="smoke smoke-3"></div>
+      </div>
+      <div class="flame-container" id="flame-container">
+        <div class="flame"></div>
+        <div class="sparkles" id="sparkles"></div>
+      </div>
+      <div class="match-head" id="match-head"></div>
+      <div class="match-stick"></div>
+    </div>
+  </div>
+
+  <script src="src/js/audio.js"></script>
+  <script src="src/js/particulas.js"></script>
+  <script src="src/js/main.js"></script>
+</body>
+</html>
